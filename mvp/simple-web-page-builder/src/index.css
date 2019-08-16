@@ -34,7 +34,8 @@ header#header h3 {
 }
 
 .editRow,.removeRow,
-.editCol, .removeCol {
+.editCol, .removeCol,
+.moveColLeft, .moveColRight {
   cursor: pointer;
   margin: 2px;
 }

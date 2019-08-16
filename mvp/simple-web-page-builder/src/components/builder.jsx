@@ -35,6 +35,8 @@ class Builder extends Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.onEditorStateChange = this.onEditorStateChange.bind(this);
+
+        this.moveColumn = this.moveColumn.bind(this);
     }
 
     componentDidMount() {
@@ -73,7 +75,8 @@ class Builder extends Component {
                                 <Column 
                                     key={col.id} 
                                     attr={col}
-                                    rowId={row.id}
+                                    row={row}
+                                    onMove={this.moveColumn}
                                     onEdit={this.editColumn}
                                     onRemove={this.removeColumn}>
                                         { convertToDom(col.content) }
@@ -202,8 +205,9 @@ class Builder extends Component {
         });
     }
 
-    editColumn(rowId, col) {
+    editColumn(row, col) {
         
+        const rowId = row.id;
         const colId = col.id;
         const widthOpts = [];
         for(let i = 1; i <= 12; i++ ) { widthOpts.push(<option key={i} value={i}>{i}</option>) }
@@ -256,8 +260,9 @@ class Builder extends Component {
         })
     }
 
-    removeColumn(rowId, col) {
+    removeColumn(row, col) {
 
+        const rowId = row.id;
         const colId = col.id;
         this.setState({
             rows: this.state.rows.map(function(row) {
@@ -270,6 +275,37 @@ class Builder extends Component {
                 }
             })
         })
+    }
+
+    moveColumn(row, col, direction) {
+
+        let columns = row.columns;
+        console.log(direction);
+
+        let oldIndex = columns.indexOf(col);
+        if (oldIndex > -1){
+            let newIndex = (oldIndex + (direction === "left" ? -1 : 1));
+            if (newIndex < 0){
+                newIndex = 0
+            }else if (newIndex >= columns.length){
+                newIndex = columns.length
+            }
+            let columnsClone = columns.slice();
+            columnsClone.splice(oldIndex,1);
+            columnsClone.splice(newIndex,0,col);
+
+            this.setState({
+                rows: this.state.rows.map(r => {
+                    if(r.id === row.id){
+                        return Object.assign({}, r, { "columns": [...columnsClone] });
+                    }else{
+                        console.log(r);
+                        return r;
+                    }
+                })
+            });
+        }
+        console.log("there");
     }
 
     handleChange() {
